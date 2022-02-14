@@ -58,6 +58,7 @@ export default defineConfig({
       // schemaPath: "https://gw.alipayobjects.com/os/antfincdn/M%24jrzTTYJN/oneapi.json"
       schemaPath: join(__dirname, 'oneapi.json'),
       mock: false,
+      projectName: 'admin',
     },
     {
       requestLibPath: "import { request } from 'umi'",
