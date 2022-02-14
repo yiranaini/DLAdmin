@@ -47,6 +47,17 @@ const Login: React.FC = () => {
     }
   };
 
+  //菜单列表
+  const fetchMenu = async () => {
+    const menu = await initialState?.fetchMenu?.();
+    if (menu && menu.length > 0) {
+      await setInitialState((s) => ({
+        ...s,
+        currentMenu: menu,
+      }));
+    }
+  };
+
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       // 登录
@@ -58,6 +69,7 @@ const Login: React.FC = () => {
         });
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
+        await fetchMenu();
         /** 此方法会跳转到 redirect 参数所在的位置 */
         if (!history) return;
         const { query } = history.location;

@@ -338,6 +338,31 @@
           }
         }
       }
+    },
+    "/api/menus": {
+      "get": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "当前可用的全部短信通知模板",
+        "description": "短信的描述",
+        "operationId": "getMessage",
+        "responses": {
+          "200": {
+            "description": "响应成功.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Message"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
