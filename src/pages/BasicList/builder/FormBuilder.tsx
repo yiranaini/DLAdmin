@@ -13,7 +13,7 @@ const FormBuilder = (data: PageApi.Datum[] | undefined) => {
       case 'datetime':
         return (
           <Form.Item label={field.title} name={field.key} key={field.key}>
-            <DatePicker showTime disabled={field.disabled} value />
+            <DatePicker showTime disabled={field.disabled} />
           </Form.Item>
         );
       case 'tree':

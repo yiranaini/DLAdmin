@@ -6,7 +6,7 @@ const menuData: MenuDataItem[] = [
   {
     id: 1,
     parent_id: 0,
-    name: '基础表格',
+    name: 'basic-list',
     icon: 'icon-table',
     path: '/basic-list',
     hideInMenu: false,
