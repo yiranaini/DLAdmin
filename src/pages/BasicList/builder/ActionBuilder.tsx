@@ -5,8 +5,8 @@ import React from 'react';
 const ActionBuilder = (
   actions: BasicListApi.Action[] | undefined,
   actionHandler: BasicListApi.ActionHandler,
-  loading: boolean,
-  record?: any,
+  loading = false,
+  record = {},
 ) => {
   return (actions || []).map((action) => {
     if (action.component === 'button') {
