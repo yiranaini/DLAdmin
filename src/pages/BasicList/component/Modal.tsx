@@ -3,6 +3,7 @@ import { useRequest } from 'umi';
 import { Modal as AntdModal, Form } from 'antd';
 import ActionBuilder from '../builder/ActionBuilder';
 import FormBuilder from '../builder/FormBuilder';
+import moment from 'moment';
 
 const Modal = ({
   modalVisible,
@@ -13,13 +14,40 @@ const Modal = ({
   hideModal: () => void;
   modalUri: string;
 }) => {
+  const [form] = Form.useForm();
   const init = useRequest<{ data: PageApi.Data }>(`${modalUri}`);
 
   useEffect(() => {
     if (modalVisible) {
+      form.resetFields();
       init.run();
     }
   }, [modalVisible]);
+
+  const setFieldsAdaptor = (data: PageApi.Data) => {
+    if (data?.layout?.tabs && data?.dataSource) {
+      const result = {};
+      data.layout.tabs.forEach((tab) => {
+        tab.data.forEach((field) => {
+          switch (field.type) {
+            case 'datetime':
+              result[field.key] = moment(data.dataSource[field.key]);
+              break;
+            default:
+              result[field.key] = data.dataSource[field.key];
+          }
+        });
+      });
+      return result;
+    }
+    return {};
+  };
+
+  useEffect(() => {
+    if (init.data) {
+      form.setFieldsValue(setFieldsAdaptor(init.data));
+    }
+  }, [init.data]);
 
   const layout = {
     labelCol: { span: 8 },
@@ -33,8 +61,19 @@ const Modal = ({
         visible={modalVisible}
         onCancel={hideModal}
         footer={ActionBuilder(init?.data?.layout?.actions[0]?.data)}
+        maskClosable={false}
       >
-        <Form {...layout}>{FormBuilder(init?.data?.layout?.tabs[0]?.data)}</Form>
+        <Form
+          form={form}
+          {...layout}
+          initialValues={{
+            create_time: moment(),
+            update_time: moment(),
+            status: true,
+          }}
+        >
+          {FormBuilder(init?.data?.layout?.tabs[0]?.data)}
+        </Form>
       </AntdModal>
     </div>
   );

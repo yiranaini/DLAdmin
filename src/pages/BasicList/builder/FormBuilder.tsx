@@ -1,13 +1,37 @@
-import { Form, Input } from 'antd';
+import { DatePicker, Form, Input, Switch, TreeSelect } from 'antd';
 import React from 'react';
 
 const FormBuilder = (data: PageApi.Datum[] | undefined) => {
   return (data || []).map((field) => {
-    return (
-      <Form.Item key={field.key} label={field.title} name={field.key}>
-        <Input />
-      </Form.Item>
-    );
+    switch (field.type) {
+      case 'text':
+        return (
+          <Form.Item label={field.title} name={field.key} key={field.key}>
+            <Input disabled={field.disabled} />
+          </Form.Item>
+        );
+      case 'datetime':
+        return (
+          <Form.Item label={field.title} name={field.key} key={field.key}>
+            <DatePicker showTime disabled={field.disabled} value />
+          </Form.Item>
+        );
+      case 'tree':
+        return (
+          <Form.Item label={field.title} name={field.key} key={field.key}>
+            <TreeSelect treeData={field.data} disabled={field.disabled} treeCheckable />
+          </Form.Item>
+        );
+      case 'switch':
+        return (
+          <Form.Item label={field.title} name={field.key} key={field.key} valuePropName="checked">
+            <Switch disabled={field.disabled} />
+          </Form.Item>
+        );
+
+      default:
+        return null;
+    }
   });
 };
 
