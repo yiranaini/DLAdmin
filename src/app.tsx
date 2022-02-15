@@ -1,7 +1,7 @@
 import type { Settings as LayoutSettings, MenuDataItem } from '@ant-design/pro-layout';
 import { SettingDrawer } from '@ant-design/pro-layout';
 import { PageLoading } from '@ant-design/pro-layout';
-import type { RunTimeLayoutConfig } from 'umi';
+import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
 import { history, Link } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
@@ -12,6 +12,7 @@ import {
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import defaultSettings from '../config/defaultSettings';
 import { message } from 'antd';
+import type { ResponseError } from 'umi-request';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -28,7 +29,6 @@ export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
   currentMenu?: MenuDataItem[];
-  loading?: boolean;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
   fetchMenu?: () => Promise<MenuDataItem[] | undefined>;
 }> {
@@ -129,4 +129,51 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     },
     ...initialState?.settings,
   };
+};
+
+/**
+ * 异常处理程序
+ * @see https://beta-pro.ant.design/docs/request-cn
+ */
+const errorHandler = (error: ResponseError) => {
+  switch (error.name) {
+    case 'BizError':
+      if (error.data.message) {
+        message.error({
+          content: error.data.message,
+          key: 'process',
+          duration: 20,
+        });
+      } else {
+        message.error({
+          content: 'Business Error, please try again.',
+          key: 'process',
+          duration: 20,
+        });
+      }
+      break;
+    case 'ResponseError':
+      message.error({
+        content: `${error.response.status} ${error.response.statusText}. Please try again.`,
+        key: 'process',
+        duration: 20,
+      });
+      break;
+    case 'TypeError':
+      message.error({
+        content: `Network error. Please try again.`,
+        key: 'process',
+        duration: 20,
+      });
+      break;
+    default:
+      break;
+  }
+
+  throw error;
+};
+
+// https://umijs.org/zh-CN/plugins/plugin-request
+export const request: RequestConfig = {
+  errorHandler,
 };

@@ -4,7 +4,9 @@ import React from 'react';
 
 const ActionBuilder = (
   actions: BasicListApi.Action[] | undefined,
-  actionHandler: (action: BasicListApi.Action) => void,
+  actionHandler: BasicListApi.ActionHandler,
+  loading: boolean,
+  record?: any,
 ) => {
   return (actions || []).map((action) => {
     if (action.component === 'button') {
@@ -13,8 +15,9 @@ const ActionBuilder = (
           key={action.text}
           type={action.type as ButtonType}
           onClick={() => {
-            actionHandler(action);
+            actionHandler(action, record);
           }}
+          loading={loading}
         >
           {action.text}
         </Button>

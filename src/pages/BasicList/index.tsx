@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Row, Col, Card, Pagination, Button } from 'antd';
+import { Table, Space, Row, Col, Card, Pagination } from 'antd';
 import { useRequest } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 
@@ -15,7 +15,7 @@ const Index = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalUri, setModalUri] = useState('');
 
-  const init = useRequest<{ data: BasicListApi.Data }>(
+  const init = useRequest<{ data: BasicListApi.ListData }>(
     `https://public-api-v2.aspirantzhang.com/api/admins?X-API-KEY=antd&page=${page}&per_page=${per_page}${sortQuery}`,
   );
 
@@ -38,6 +38,18 @@ const Index = () => {
   };
 
   const searchLayout = () => {};
+
+  const actionHandler = (action: BasicListApi.Action) => {
+    switch (action.action) {
+      case 'modal':
+        setModalUri(action.uri as string);
+        setModalVisible(true);
+        break;
+      default:
+        break;
+    }
+  };
+
   const beforeTableLayout = () => {
     return (
       <Row>
@@ -45,7 +57,7 @@ const Index = () => {
           ...
         </Col>
         <Col xs={24} sm={12} className={styles.tableToolbar}>
-          <Space>{ActionBuilder(init?.data?.layout?.tableToolBar)}</Space>
+          <Space>{ActionBuilder(init?.data?.layout?.tableToolBar, actionHandler, false)}</Space>
         </Col>
       </Row>
     );
@@ -75,30 +87,12 @@ const Index = () => {
 
   return (
     <PageContainer>
-      <Button
-        type="primary"
-        onClick={() => {
-          setModalUri('https://public-api-v2.aspirantzhang.com/api/admins/add?X-API-KEY=antd');
-          setModalVisible(true);
-        }}
-      >
-        Add
-      </Button>
-      <Button
-        type="primary"
-        onClick={() => {
-          setModalUri('https://public-api-v2.aspirantzhang.com/api/admins/206?X-API-KEY=antd');
-          setModalVisible(true);
-        }}
-      >
-        Edit
-      </Button>
       {searchLayout()}
       <Card>
         {beforeTableLayout()}
         <Table
           rowKey="id"
-          columns={ColumnBuilder(init?.data?.layout?.tableColumn)}
+          columns={ColumnBuilder(init?.data?.layout?.tableColumn, actionHandler)}
           dataSource={init?.data?.dataSource}
           pagination={false}
           onChange={tableChangeHandler}
