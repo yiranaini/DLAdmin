@@ -22,7 +22,7 @@ const ColumnBuilder = (
             return <Tag color={value ? 'blue' : 'red'}>{option?.title}</Tag>;
           };
           break;
-        case 'action':
+        case 'actions':
           column.render = (_: any, record: any) => {
             return <Space>{ActionBuilder(column.actions, actionHandler, false, record)}</Space>;
           };
