@@ -4,28 +4,11 @@ import { Request, Response } from 'express';
 
 const menuData: MenuDataItem[] = [
   {
-    id: 1,
-    parent_id: 0,
-    name: 'basic-list',
-    icon: 'icon-table',
-    path: '/basic-list',
-    hideInMenu: false,
-    hideChildrenInMenu: false,
-    flatMenu: false,
-    status: 1,
-    create_time: '2020-10-14T16:09:14+08:00',
-    delete_time: null,
-    value: 14,
-    title: 'basic-list',
-    depth: 1,
-    children: [],
-  },
-  {
     id: 5,
     parent_id: 0,
-    name: 'admin-list',
-    icon: 'icon-user',
-    path: '/basic-list/api/admins',
+    name: 'basic-list',
+    icon: 'user',
+    path: '/basic-list',
     hideInMenu: false,
     hideChildrenInMenu: false,
     flatMenu: false,
@@ -33,7 +16,7 @@ const menuData: MenuDataItem[] = [
     create_time: '2020-10-14T16:02:58+08:00',
     delete_time: null,
     value: 5,
-    title: 'admin-list',
+    title: 'basic-list',
     depth: 1,
     children: [
       {

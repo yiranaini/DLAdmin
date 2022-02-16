@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Space, Row, Col, Card, Pagination, Modal as AntdModal, message } from 'antd';
-import { useRequest, useIntl } from 'umi';
+import { useRequest, useIntl, history } from 'umi';
 import { useSessionStorageState } from 'ahooks';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -84,6 +84,13 @@ const Index = () => {
         );
         setModalVisible(true);
         break;
+      case 'page': {
+        const uri = (action.uri || '').replace(/:\w+/g, (field) => {
+          return record[field.replace(':', '')];
+        });
+        history.push(`/basic-list${uri}`);
+        break;
+      }
       case 'reload':
         init.run();
         break;
@@ -119,6 +126,7 @@ const Index = () => {
             console.log('Cancel');
           },
         });
+        break;
       }
 
       default:
