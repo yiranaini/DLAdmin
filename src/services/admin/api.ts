@@ -17,7 +17,7 @@ export async function currentMenu(options?: { [key: string]: any }) {
   //   method: 'GET',
   //   ...(options || {}),
   // });
-  return request('https://public-api-v2.aspirantzhang.com/api/menus/backend', {
+  return request<MenuDataItem[]>('https://public-api-v2.aspirantzhang.com/api/menus/backend', {
     method: 'GET',
     ...(options || {}),
   });

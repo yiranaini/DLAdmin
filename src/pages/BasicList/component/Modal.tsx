@@ -54,6 +54,7 @@ const Modal = ({
       formatResult: (res: any) => {
         return res;
       },
+      throttleInterval: 1000,
     },
   );
 
@@ -110,7 +111,6 @@ const Modal = ({
           <Spin className={styles.formSpin} tip="Loading..." />
         ) : (
           <>
-            {' '}
             <Form
               form={form}
               {...layout}
