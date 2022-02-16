@@ -30,7 +30,6 @@ export async function getInitialState(): Promise<{
   currentUser?: API.CurrentUser;
   currentMenu?: MenuDataItem[];
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
-  fetchMenu?: () => Promise<MenuDataItem[] | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -57,7 +56,6 @@ export async function getInitialState(): Promise<{
     console.log(currentMenu);
     return {
       fetchUserInfo,
-      fetchMenu,
       currentUser,
       currentMenu,
       settings: defaultSettings,

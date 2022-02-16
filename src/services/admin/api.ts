@@ -13,7 +13,11 @@ export async function currentUser(options?: { [key: string]: any }) {
 
 /** 获取当前的菜单列表 */
 export async function currentMenu(options?: { [key: string]: any }) {
-  return request<MenuDataItem[]>('/api/menus', {
+  // return request<MenuDataItem[]>('/api/menus', {
+  //   method: 'GET',
+  //   ...(options || {}),
+  // });
+  return request('https://public-api-v2.aspirantzhang.com/api/menus/backend', {
     method: 'GET',
     ...(options || {}),
   });
