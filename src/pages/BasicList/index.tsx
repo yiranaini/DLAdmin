@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Space, Row, Col, Card, Pagination, Modal as AntdModal, message } from 'antd';
-import { useRequest } from 'umi';
+import { useRequest, useIntl } from 'umi';
+import { useSessionStorageState } from 'ahooks';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
@@ -10,19 +11,20 @@ import ColumnBuilder from './builder/ColumnBuilder';
 import Modal from './component/Modal';
 
 const Index = () => {
-  const [page, setPage] = useState(1);
-  const [per_page, setPerPage] = useState(10);
+  const [pageQuery, setPageQuery] = useState('');
   const [sortQuery, setSorterQuery] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [modalUri, setModalUri] = useState('');
   const [selectedRowKeys, setSelectRowKeys] = useState([]);
   const [selectedRows, setSelectRows] = useState([]);
-  const [tableColumns, setTableColumns] = useState<BasicListApi.Field[]>([]);
+  const [tableColumns, setTableColumns] =
+    useSessionStorageState<BasicListApi.Field[]>('basicListTableColumns');
 
   const { confirm } = AntdModal;
+  const lang = useIntl();
 
   const init = useRequest<{ data: BasicListApi.ListData }>(
-    `https://public-api-v2.aspirantzhang.com/api/admins?X-API-KEY=antd&page=${page}&per_page=${per_page}${sortQuery}`,
+    `https://public-api-v2.aspirantzhang.com/api/admins?X-API-KEY=antd&page=${pageQuery}${sortQuery}`,
   );
 
   const request = useRequest(
@@ -46,7 +48,7 @@ const Index = () => {
       manual: true,
       onSuccess: (data) => {
         message.success({
-          content: data.message,
+          content: data?.message,
           key: 'process',
         });
       },
@@ -58,7 +60,7 @@ const Index = () => {
 
   useEffect(() => {
     init.run();
-  }, [page, per_page, sortQuery]);
+  }, [pageQuery, sortQuery]);
 
   useEffect(() => {
     if (init?.data?.layout?.tableColumn) {
@@ -66,21 +68,78 @@ const Index = () => {
     }
   }, [init?.data?.layout?.tableColumn]);
 
-  const batchOverView = () => {
+  useEffect(() => {
+    if (modalUri) {
+      setModalVisible(true);
+    }
+  }, [modalUri]);
+
+  function actionHandler(action: BasicListApi.Action, record: any) {
+    switch (action.action) {
+      case 'modal':
+        setModalUri(
+          (action.uri || '').replace(/:\w+/g, (field) => {
+            return record[field.replace(':', '')];
+          }) as string,
+        );
+        setModalVisible(true);
+        break;
+      case 'reload':
+        init.run();
+        break;
+      case 'delete':
+      case 'deletePermanently':
+      case 'restore': {
+        const operationName = lang.formatMessage({
+          id: `basic-list.list.actionHandler.operation.${action.action}`,
+        });
+        confirm({
+          title: lang.formatMessage(
+            {
+              id: 'basic-list.list.actionHandler.confirmTitle',
+            },
+            {
+              operationName,
+            },
+          ),
+          icon: <ExclamationCircleOutlined />,
+          content: batchOverView(Object.keys(record).length ? [record] : selectedRows),
+          okText: `Sure to ${action.action}!!!`,
+          okType: 'danger',
+          cancelText: 'Cancel',
+          onOk() {
+            return request.run({
+              uri: action.uri,
+              method: action.method,
+              type: action.action,
+              id: Object.keys(record).length ? [record.id] : selectedRowKeys,
+            });
+          },
+          onCancel() {
+            console.log('Cancel');
+          },
+        });
+      }
+
+      default:
+        break;
+    }
+  }
+
+  function batchOverView(dataSource: BasicListApi.Field[]) {
     return (
       <Table
         size="small"
         rowKey="id"
-        columns={[tableColumns[0] || {}, tableColumns[1] || {}]}
-        dataSource={selectedRows}
+        columns={tableColumns ? [tableColumns[0] || {}, tableColumns[1] || {}] : []}
+        dataSource={dataSource}
         pagination={false}
       />
     );
-  };
+  }
 
   const paginationChangeHandler = (_page: number, _per_page: number) => {
-    setPage(_page);
-    setPerPage(_per_page);
+    setPageQuery(`&page=${_page}&per_page=${_per_page}`);
   };
 
   const tableChangeHandler = (_: any, __: any, sorter: any) => {
@@ -92,45 +151,23 @@ const Index = () => {
     }
   };
 
-  const searchLayout = () => {};
-
-  function actionHandler(action: BasicListApi.Action, record: any) {
-    switch (action.action) {
-      case 'modal':
-        setModalUri(
-          action.uri?.replace(/:\w+/g, (field) => {
-            return record[field.replace(':', '')];
-          }) as string,
-        );
-        setModalVisible(true);
-        break;
-      case 'reload':
-        init.run();
-        break;
-      case 'delete':
-        confirm({
-          title: 'Are you sure delete this task?',
-          icon: <ExclamationCircleOutlined />,
-          content: batchOverView(),
-          okText: 'Sure to Delete!!!',
-          okType: 'danger',
-          cancelText: 'Cancel',
-          onOk() {
-            return request.run({
-              uri: action.uri,
-              method: action.method,
-              type: 'delete',
-              id: selectedRowKeys,
-            });
-          },
-          onCancel() {
-            console.log('Cancel');
-          },
-        });
-      default:
-        break;
+  const hideModal = (reload = false) => {
+    setModalVisible(false);
+    setModalUri('');
+    if (reload) {
+      init.run();
     }
-  }
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (_selectedRowKeys: any, _selectRows: any) => {
+      setSelectRowKeys(_selectedRowKeys);
+      setSelectRows(_selectRows);
+    },
+  };
+
+  const searchLayout = () => {};
 
   const beforeTableLayout = () => {
     return (
@@ -144,6 +181,7 @@ const Index = () => {
       </Row>
     );
   };
+
   const afterTableLayout = () => {
     return (
       <Row>
@@ -165,22 +203,8 @@ const Index = () => {
       </Row>
     );
   };
+
   const toolbarLayout = () => {};
-
-  const hideModal = (reload = false) => {
-    setModalVisible(false);
-    if (reload) {
-      init.run();
-    }
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (_selectedRowKeys: any, _selectRows: any) => {
-      setSelectRowKeys(_selectedRowKeys);
-      setSelectRows(_selectRows);
-    },
-  };
 
   const batchToolbar = () => {
     return (
@@ -200,6 +224,7 @@ const Index = () => {
           columns={tableColumns}
           dataSource={init?.data?.dataSource}
           pagination={false}
+          loading={init?.loading}
           onChange={tableChangeHandler}
           rowSelection={rowSelection}
         />

@@ -29,6 +29,7 @@ const Modal = ({
 
   const request = useRequest(
     (values: any) => {
+      message.loading({ content: 'Processing...', key: 'process', duration: 0 });
       const { uri, method, ...formValues } = values;
       return {
         url: `https://public-api-v2.aspirantzhang.com${uri}`,
@@ -69,15 +70,6 @@ const Modal = ({
     }
   }, [init.data]);
 
-  const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
-  };
-
-  const onFinish = (values: any) => {
-    request.run(values);
-  };
-
   const actionHandler = (action: BasicListApi.Action) => {
     switch (action.action) {
       case 'submit':
@@ -95,6 +87,15 @@ const Modal = ({
     }
   };
 
+  const onFinish = (values: any) => {
+    request.run(values);
+  };
+
+  const layout = {
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
+  };
+
   return (
     <div>
       <AntdModal
@@ -103,6 +104,7 @@ const Modal = ({
         onCancel={() => hideModal()}
         footer={ActionBuilder(init?.data?.layout?.actions[0]?.data, actionHandler, request.loading)}
         maskClosable={false}
+        forceRender
       >
         {init?.loading ? (
           <Spin className={styles.formSpin} tip="Loading..." />
