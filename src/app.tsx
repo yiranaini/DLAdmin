@@ -97,11 +97,19 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
           </Link>,
         ]
       : [],
-    menuHeaderRender: undefined,
-    // initialState的菜单数据
-    menuDataRender: () => {
-      return initialState?.currentMenu || [];
+    menu: {
+      params: { userId: initialState?.currentUser?.userid },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      request: async (params: any, defaultMenuData: any) => {
+        const menuData = await queryCurrentMenu();
+        return menuData;
+      },
     },
+    // menuHeaderRender: undefined,
+    // // initialState的菜单数据
+    // menuDataRender: () => {
+    //   return initialState?.currentMenu || [];
+    // },
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     // 增加一个 loading 的状态

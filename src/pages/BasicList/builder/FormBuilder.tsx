@@ -64,7 +64,7 @@ const FormBuilder = (data: BasicListApi.Field[] | undefined) => {
         );
       case 'parent':
         return (
-          <Form.Item>
+          <Form.Item {...basicAttr}>
             <TreeSelect
               showSearch
               style={{ width: '100%' }}
