@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { useRequest } from 'umi';
-import { Modal as AntdModal, Form, Input, message } from 'antd';
+import { Modal as AntdModal, Form, Input, message, Tag, Spin } from 'antd';
 import ActionBuilder from '../builder/ActionBuilder';
 import FormBuilder from '../builder/FormBuilder';
 import moment from 'moment';
 import { setFieldsAdaptor, submitFieldsAdaptor } from '../helper';
+import styles from '../index.less';
 
 const Modal = ({
   modalVisible,
@@ -103,24 +104,34 @@ const Modal = ({
         footer={ActionBuilder(init?.data?.layout?.actions[0]?.data, actionHandler, request.loading)}
         maskClosable={false}
       >
-        <Form
-          form={form}
-          {...layout}
-          initialValues={{
-            create_time: moment(),
-            update_time: moment(),
-            status: true,
-          }}
-          onFinish={onFinish}
-        >
-          {FormBuilder(init?.data?.layout?.tabs[0]?.data)}
-          <Form.Item name="uri" key="uri" hidden>
-            <Input />
-          </Form.Item>
-          <Form.Item name="method" key="method" hidden>
-            <Input />
-          </Form.Item>
-        </Form>
+        {init?.loading ? (
+          <Spin className={styles.formSpin} tip="Loading..." />
+        ) : (
+          <>
+            {' '}
+            <Form
+              form={form}
+              {...layout}
+              initialValues={{
+                create_time: moment(),
+                update_time: moment(),
+                status: true,
+              }}
+              onFinish={onFinish}
+            >
+              {FormBuilder(init?.data?.layout?.tabs[0]?.data)}
+              <Form.Item name="uri" key="uri" hidden>
+                <Input />
+              </Form.Item>
+              <Form.Item name="method" key="method" hidden>
+                <Input />
+              </Form.Item>
+            </Form>
+            <Tag className={styles.formUpdateTime}>
+              Update Time: {moment(form.getFieldValue('update_time')).format('YYYY-MM-DD HH:mm:ss')}
+            </Tag>
+          </>
+        )}
       </AntdModal>
     </div>
   );
