@@ -17,26 +17,22 @@ const Modal = ({
   modalUri: string;
 }) => {
   const [form] = Form.useForm();
-  const init = useRequest<{ data: BasicListApi.PageData }>(
-    `https://public-api-v2.aspirantzhang.com${modalUri}?X-API-KEY=antd`,
-    {
-      manual: true,
-      onError: () => {
-        hideModal();
-      },
+  const init = useRequest<{ data: BasicListApi.PageData }>(`${modalUri}`, {
+    manual: true,
+    onError: () => {
+      hideModal();
     },
-  );
+  });
 
   const request = useRequest(
     (values: any) => {
       message.loading({ content: 'Processing...', key: 'process', duration: 0 });
       const { uri, method, ...formValues } = values;
       return {
-        url: `https://public-api-v2.aspirantzhang.com${uri}`,
+        url: `${uri}`,
         method,
         data: {
           ...submitFieldsAdaptor(formValues),
-          'X-API-KEY': 'antd',
           create_time: moment(formValues.create_time).format(),
           update_time: moment(formValues.update_time).format(),
         },

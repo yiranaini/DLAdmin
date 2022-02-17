@@ -45,10 +45,7 @@ const Index = () => {
 
   const init = useRequest<{ data: BasicListApi.ListData }>((values: any) => {
     return {
-      url: `https://public-api-v2.aspirantzhang.com${location.pathname.replace(
-        '/basic-list',
-        '',
-      )}?X-API-KEY=antd${pageQuery}${sortQuery}`,
+      url: `${location.pathname.replace('/basic-list', '')}?${pageQuery}${sortQuery}`,
       params: values,
       paramSerializer: (params: any) => {
         return stringify(params, { arrayFormat: 'comma', skipEmptyString: true, skipNull: true });
@@ -65,11 +62,10 @@ const Index = () => {
       });
       const { uri, method, ...formValues } = values;
       return {
-        url: `https://public-api-v2.aspirantzhang.com${uri}`,
+        url: `${uri}`,
         method,
         data: {
           ...formValues,
-          'X-API-KEY': 'antd',
         },
       };
     },

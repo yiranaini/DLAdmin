@@ -14,10 +14,7 @@ const Page = () => {
   const location = useLocation();
 
   const init = useRequest<{ data: BasicListApi.PageData }>(
-    `https://public-api-v2.aspirantzhang.com${location.pathname.replace(
-      '/basic-list',
-      '',
-    )}?X-API-KEY=antd`,
+    `${location.pathname.replace('/basic-list', '')}`,
     {
       onError: () => {
         history.goBack();
@@ -34,11 +31,10 @@ const Page = () => {
       });
       const { uri, method, ...formValues } = values;
       return {
-        url: `https://public-api-v2.aspirantzhang.com${uri}`,
+        url: `${uri}`,
         method,
         data: {
           ...submitFieldsAdaptor(formValues),
-          'X-API-KEY': 'antd',
         },
       };
     },

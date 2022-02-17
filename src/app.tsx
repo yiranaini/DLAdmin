@@ -30,6 +30,7 @@ export async function getInitialState(): Promise<{
   currentUser?: API.CurrentUser;
   currentMenu?: MenuDataItem[];
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  fetchMenu?: () => Promise<MenuDataItem[] | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -57,6 +58,7 @@ export async function getInitialState(): Promise<{
     return {
       fetchUserInfo,
       currentUser,
+      fetchMenu,
       currentMenu,
       settings: defaultSettings,
     };
@@ -80,7 +82,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       const { location } = history;
       // 如果没有登录，重定向到 login
       if (!initialState?.currentUser && location.pathname !== loginPath) {
-        history.push(loginPath);
+        history.push(loginPath, { redirect: location.pathname });
       }
     },
     links: isDev
