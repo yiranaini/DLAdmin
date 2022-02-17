@@ -145,7 +145,7 @@ const Index = () => {
               uri: action.uri,
               method: action.method,
               type: action.action,
-              id: Object.keys(record).length ? [record.id] : selectedRowKeys,
+              ids: Object.keys(record).length ? [record.id] : selectedRowKeys,
             });
           },
           onCancel() {
