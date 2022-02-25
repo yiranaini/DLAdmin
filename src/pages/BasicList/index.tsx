@@ -43,15 +43,23 @@ const Index = () => {
   const [searchForm] = Form.useForm();
   const location = useLocation();
 
-  const init = useRequest<{ data: BasicListApi.ListData }>((values: any) => {
-    return {
-      url: `${location.pathname.replace('/basic-list', '')}?${pageQuery}${sortQuery}`,
-      params: values,
-      paramSerializer: (params: any) => {
-        return stringify(params, { arrayFormat: 'comma', skipEmptyString: true, skipNull: true });
+  const init = useRequest<{ data: BasicListApi.ListData }>(
+    (values: any) => {
+      return {
+        url: `${location.pathname.replace('/basic-list', '')}?${pageQuery}${sortQuery}`,
+        params: values,
+        paramSerializer: (params: any) => {
+          return stringify(params, { arrayFormat: 'comma', skipEmptyString: true, skipNull: true });
+        },
+      };
+    },
+    {
+      onSuccess: () => {
+        setSelectRowKeys([]);
+        setSelectRows([]);
       },
-    };
-  });
+    },
+  );
 
   const request = useRequest(
     (values: any) => {
@@ -229,6 +237,8 @@ const Index = () => {
                       onClick={() => {
                         init.run();
                         searchForm.resetFields();
+                        setSelectRowKeys([]);
+                        setSelectRows([]);
                       }}
                     >
                       Clear
